@@ -9,7 +9,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from protocol.protocol_generator import (
+from api.generate import (
     build_key12,
     build_key9,
     pack_time4,
