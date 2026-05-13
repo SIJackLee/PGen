@@ -496,6 +496,15 @@ export default function JsonProtocolGenerator() {
             <pre className="whitespace-pre-wrap break-all text-sm leading-6 text-slate-100">
               {output.raw_mqtt_connect_hex}
             </pre>
+            <div className="mt-4 rounded-xl border border-emerald-900 bg-emerald-950/30 p-4">
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <p className="text-sm font-medium text-emerald-200">예상 CONNACK HEX</p>
+                <CopyButton label="CONNACK 복사" value="20 02 00 00" />
+              </div>
+              <pre className="whitespace-pre-wrap break-all text-sm leading-6 text-slate-100">
+                20 02 00 00
+              </pre>
+            </div>
           </SectionCard>
         ) : null}
 
@@ -512,6 +521,15 @@ export default function JsonProtocolGenerator() {
             <pre className="whitespace-pre-wrap break-all text-sm leading-6 text-slate-100">
               {output.raw_mqtt_publish_hex}
             </pre>
+            <div className="mt-4 rounded-xl border border-emerald-900 bg-emerald-950/30 p-4">
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <p className="text-sm font-medium text-emerald-200">예상 PUBACK HEX</p>
+                <CopyButton label="PUBACK 복사" value="40 02 00 01" />
+              </div>
+              <pre className="whitespace-pre-wrap break-all text-sm leading-6 text-slate-100">
+                40 02 00 01
+              </pre>
+            </div>
           </SectionCard>
         ) : null}
 
