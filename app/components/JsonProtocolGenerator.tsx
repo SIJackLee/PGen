@@ -138,6 +138,71 @@ function SectionCard({
   );
 }
 
+function buildHexAsciiConversionRows(hexValue: string) {
+  return hexValue
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((hex) => {
+      const byte = Number.parseInt(hex, 16);
+      const ascii = byte >= 0x20 && byte <= 0x7e ? String.fromCharCode(byte) : ".";
+      const meaning =
+        ascii === "."
+          ? "비가시 바이트이므로 '.'로 표시"
+          : ascii === " "
+            ? "출력 가능한 공백 문자"
+            : `출력 가능한 ASCII 문자 '${ascii}'`;
+
+      return { hex, ascii, meaning };
+    });
+}
+
+function HexAsciiConversionDetails({
+  hexValue,
+  asciiValue,
+}: {
+  hexValue: string;
+  asciiValue: string;
+}) {
+  const rows = buildHexAsciiConversionRows(hexValue);
+
+  return (
+    <details className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+      <summary className="cursor-pointer list-none text-sm font-medium text-amber-200">
+        HEX → ASCII 변환 과정 보기
+      </summary>
+      <div className="mt-3 space-y-3">
+        <p className="text-sm leading-6 text-slate-300">
+          각 HEX 바이트를 ASCII로 해석합니다. 출력 가능한 범위(`0x20`~`0x7E`)는 문자로 보이고,
+          그 외 바이트는 `.`로 치환합니다.
+        </p>
+        <pre className="whitespace-pre-wrap break-all rounded-lg bg-slate-950 p-3 text-sm leading-6 text-slate-100">
+          {asciiValue}
+        </pre>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left text-sm text-slate-200">
+            <thead className="text-slate-400">
+              <tr>
+                <th className="px-3 py-2 font-medium">HEX</th>
+                <th className="px-3 py-2 font-medium">ASCII</th>
+                <th className="px-3 py-2 font-medium">설명</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, index) => (
+                <tr key={`${row.hex}-${index}`} className="border-t border-slate-800">
+                  <td className="px-3 py-2 font-mono">{row.hex}</td>
+                  <td className="px-3 py-2 font-mono">{row.ascii === " " ? "[space]" : row.ascii}</td>
+                  <td className="px-3 py-2">{row.meaning}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+  );
+}
+
 export default function JsonProtocolGenerator() {
   const [form, setForm] = useState<JsonRoomStateForm>(DEFAULT_JSON_FORM);
   const [showCompact, setShowCompact] = useState(false);
@@ -519,6 +584,10 @@ export default function JsonProtocolGenerator() {
                 </pre>
               </div>
             </div>
+            <HexAsciiConversionDetails
+              hexValue={output.raw_mqtt_connect_hex}
+              asciiValue={output.raw_mqtt_connect_ascii}
+            />
             <div className="mt-4 rounded-xl border border-emerald-900 bg-emerald-950/30 p-4">
               <div className="mb-2 flex items-center justify-between gap-3">
                 <p className="text-sm font-medium text-emerald-200">예상 CONNACK HEX</p>
@@ -562,6 +631,10 @@ export default function JsonProtocolGenerator() {
                 </pre>
               </div>
             </div>
+            <HexAsciiConversionDetails
+              hexValue={output.raw_mqtt_publish_hex}
+              asciiValue={output.raw_mqtt_publish_ascii}
+            />
             <div className="mt-4 rounded-xl border border-emerald-900 bg-emerald-950/30 p-4">
               <div className="mb-2 flex items-center justify-between gap-3">
                 <p className="text-sm font-medium text-emerald-200">예상 PUBACK HEX</p>
