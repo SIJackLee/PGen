@@ -113,10 +113,12 @@ function FlowCard({
 
 function SectionCard({
   title,
+  subtitle,
   action,
   children,
 }: {
   title: string;
+  subtitle?: string;
   action?: React.ReactNode;
   children: React.ReactNode;
 }) {
@@ -128,6 +130,9 @@ function SectionCard({
         </h3>
         {action}
       </div>
+      {subtitle ? (
+        <p className="mb-3 text-sm leading-6 text-slate-400">{subtitle}</p>
+      ) : null}
       {children}
     </section>
   );
@@ -486,6 +491,7 @@ export default function JsonProtocolGenerator() {
         {output ? (
           <SectionCard
             title="Raw MQTT CONNECT"
+            subtitle="MQTT 연결 메시지"
             action={<CopyButton label="CONNECT HEX 복사" value={output.raw_mqtt_connect_hex} />}
           >
             <div className="mb-3 rounded-xl border border-slate-800 bg-slate-900/80 p-4 text-sm leading-6 text-slate-100">
@@ -511,6 +517,7 @@ export default function JsonProtocolGenerator() {
         {output ? (
           <SectionCard
             title="Raw MQTT PUBLISH"
+            subtitle="메시지 전송"
             action={<CopyButton label="PUBLISH HEX 복사" value={output.raw_mqtt_publish_hex} />}
           >
             <div className="mb-3 rounded-xl border border-slate-800 bg-slate-900/80 p-4 text-sm leading-6 text-slate-100">
@@ -564,12 +571,9 @@ export default function JsonProtocolGenerator() {
         ) : null}
 
         {output ? (
-          <SectionCard
-            title="전송할 JSON Payload"
-            action={<CopyButton label="페이로드 복사" value={output.payload_compact} />}
-          >
+          <SectionCard title="RAW MQTT PUBLISH Payload">
             <pre className="whitespace-pre-wrap break-all text-sm leading-6 text-slate-100">
-              {payloadText}
+              {output.payload_compact}
             </pre>
           </SectionCard>
         ) : null}
