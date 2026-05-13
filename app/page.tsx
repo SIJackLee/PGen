@@ -5,8 +5,8 @@ import JsonProtocolGenerator from "@/app/components/JsonProtocolGenerator";
 import LegacyBinaryGenerator from "@/app/components/LegacyBinaryGenerator";
 
 const tabs = [
-  { key: "json", label: "JSON Protocol Generator" },
-  { key: "legacy", label: "Legacy Binary Generator" },
+  { key: "json", label: "JSON 프로토콜 생성기" },
+  { key: "legacy", label: "기존 Binary 생성기" },
 ] as const;
 
 type TabKey = (typeof tabs)[number]["key"];
@@ -19,14 +19,14 @@ export default function Home() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <header className="mb-8 rounded-[32px] border border-slate-800 bg-[radial-gradient(circle_at_top_left,#164e63_0%,#020617_55%)] p-8 shadow-[0_30px_120px_rgba(0,0,0,0.45)]">
           <p className="text-sm uppercase tracking-[0.35em] text-cyan-200">
-            Protocol Generator
+            프로토콜 생성기
           </p>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white">
             JSON Room State Protocol v2
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">
-            Default output now targets MQTT STATE topic, JSON payload, mosquitto publish command,
-            and ACK subscribe command. Legacy Binary/HEX/B64 code is preserved in a separate tab.
+            기본 출력은 MQTT STATE 토픽, JSON 페이로드, mosquitto publish 명령, ACK 구독
+            명령 기준입니다. 기존 Binary/HEX/B64 코드는 별도 탭에서 유지됩니다.
           </p>
         </header>
 

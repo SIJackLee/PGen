@@ -12,10 +12,11 @@ function toForm(body: Record<string, unknown>): JsonRoomStateForm {
   const eqpmnInput = Array.isArray(body.eqpmn) ? body.eqpmn : DEFAULT_JSON_FORM.eqpmn;
 
   return {
+    broker_ip: String(body.broker_ip ?? DEFAULT_JSON_FORM.broker_ip),
+    broker_port: String(body.broker_port ?? DEFAULT_JSON_FORM.broker_port),
     isnd_regist_no: String(body.isnd_regist_no ?? DEFAULT_JSON_FORM.isnd_regist_no),
-    seq: String(body.seq ?? DEFAULT_JSON_FORM.seq),
     measure_ts: String(body.measure_ts ?? DEFAULT_JSON_FORM.measure_ts),
-    species: String(body.species ?? DEFAULT_JSON_FORM.species),
+    species: String(body.species ?? DEFAULT_JSON_FORM.species) as JsonRoomStateForm["species"],
     stall_ty_code: String(body.stall_ty_code ?? DEFAULT_JSON_FORM.stall_ty_code),
     stall_no: String(body.stall_no ?? DEFAULT_JSON_FORM.stall_no),
     room_no: String(body.room_no ?? DEFAULT_JSON_FORM.room_no),
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+    return NextResponse.json({ error: "JSON 요청 본문이 올바르지 않습니다." }, { status: 400 });
   }
 
   const form = toForm(body);
