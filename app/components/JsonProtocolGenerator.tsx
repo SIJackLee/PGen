@@ -499,9 +499,26 @@ export default function JsonProtocolGenerator() {
               <p>Keep Alive: 60</p>
               <p>Clean Session: true</p>
             </div>
-            <pre className="whitespace-pre-wrap break-all text-sm leading-6 text-slate-100">
-              {output.raw_mqtt_connect_hex}
-            </pre>
+            <div className="space-y-4">
+              <div>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium text-slate-300">HEX</p>
+                  <CopyButton label="CONNECT HEX 복사" value={output.raw_mqtt_connect_hex} />
+                </div>
+                <pre className="whitespace-pre-wrap break-all text-sm leading-6 text-slate-100">
+                  {output.raw_mqtt_connect_hex}
+                </pre>
+              </div>
+              <div>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium text-slate-300">ASCII</p>
+                  <CopyButton label="CONNECT ASCII 복사" value={output.raw_mqtt_connect_ascii} />
+                </div>
+                <pre className="whitespace-pre-wrap break-all text-sm leading-6 text-slate-100">
+                  {output.raw_mqtt_connect_ascii}
+                </pre>
+              </div>
+            </div>
             <div className="mt-4 rounded-xl border border-emerald-900 bg-emerald-950/30 p-4">
               <div className="mb-2 flex items-center justify-between gap-3">
                 <p className="text-sm font-medium text-emerald-200">예상 CONNACK HEX</p>
@@ -525,9 +542,26 @@ export default function JsonProtocolGenerator() {
               <p>QoS: 1</p>
               <p>Packet ID: 1</p>
             </div>
-            <pre className="whitespace-pre-wrap break-all text-sm leading-6 text-slate-100">
-              {output.raw_mqtt_publish_hex}
-            </pre>
+            <div className="space-y-4">
+              <div>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium text-slate-300">HEX</p>
+                  <CopyButton label="PUBLISH HEX 복사" value={output.raw_mqtt_publish_hex} />
+                </div>
+                <pre className="whitespace-pre-wrap break-all text-sm leading-6 text-slate-100">
+                  {output.raw_mqtt_publish_hex}
+                </pre>
+              </div>
+              <div>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium text-slate-300">ASCII</p>
+                  <CopyButton label="PUBLISH ASCII 복사" value={output.raw_mqtt_publish_ascii} />
+                </div>
+                <pre className="whitespace-pre-wrap break-all text-sm leading-6 text-slate-100">
+                  {output.raw_mqtt_publish_ascii}
+                </pre>
+              </div>
+            </div>
             <div className="mt-4 rounded-xl border border-emerald-900 bg-emerald-950/30 p-4">
               <div className="mb-2 flex items-center justify-between gap-3">
                 <p className="text-sm font-medium text-emerald-200">예상 PUBACK HEX</p>

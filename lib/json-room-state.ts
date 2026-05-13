@@ -111,7 +111,9 @@ export interface JsonRoomStateOutput {
   payload_compact: string;
   mqtt_client_id: string;
   raw_mqtt_connect_hex: string;
+  raw_mqtt_connect_ascii: string;
   raw_mqtt_publish_hex: string;
+  raw_mqtt_publish_ascii: string;
   mosquitto_pub_command: string;
   mosquitto_sub_ack_command: string;
   warnings: string[];
@@ -309,11 +311,23 @@ function toHex(bytes: Uint8Array): string {
     .join(" ");
 }
 
+function toAscii(bytes: Uint8Array): string {
+  return Array.from(bytes, (byte) => (byte >= 0x20 && byte <= 0x7e ? String.fromCharCode(byte) : ".")).join("");
+}
+
 export function buildMqttClientId(form: JsonRoomStateForm): string {
   return `json_${form.isnd_regist_no}_${form.stall_ty_code}_${form.stall_no}_${form.room_no}`;
 }
 
 export function buildRawMqttConnectHex(clientId: string, keepAlive = 60): string {
+  return toHex(buildRawMqttConnectPacket(clientId, keepAlive));
+}
+
+export function buildRawMqttConnectAscii(clientId: string, keepAlive = 60): string {
+  return toAscii(buildRawMqttConnectPacket(clientId, keepAlive));
+}
+
+function buildRawMqttConnectPacket(clientId: string, keepAlive = 60): Uint8Array {
   const variableHeader = new Uint8Array([
     0x00,
     0x04,
@@ -328,17 +342,23 @@ export function buildRawMqttConnectHex(clientId: string, keepAlive = 60): string
   ]);
   const payload = mqttString(clientId);
   const remaining = concat(variableHeader, payload);
-  const packet = concat([0x10], encodeRemainingLength(remaining.length), remaining);
-  return toHex(packet);
+  return concat([0x10], encodeRemainingLength(remaining.length), remaining);
 }
 
 export function buildRawMqttPublishHex(topic: string, payloadText: string, packetId = 1): string {
+  return toHex(buildRawMqttPublishPacket(topic, payloadText, packetId));
+}
+
+export function buildRawMqttPublishAscii(topic: string, payloadText: string, packetId = 1): string {
+  return toAscii(buildRawMqttPublishPacket(topic, payloadText, packetId));
+}
+
+function buildRawMqttPublishPacket(topic: string, payloadText: string, packetId = 1): Uint8Array {
   const topicBytes = mqttString(topic);
   const packetIdBytes = new Uint8Array([(packetId >> 8) & 0xff, packetId & 0xff]);
   const payloadBytes = new TextEncoder().encode(payloadText);
   const remaining = concat(topicBytes, packetIdBytes, payloadBytes);
-  const packet = concat([0x32], encodeRemainingLength(remaining.length), remaining);
-  return toHex(packet);
+  return concat([0x32], encodeRemainingLength(remaining.length), remaining);
 }
 
 export function generateJsonRoomStateOutput(form: JsonRoomStateForm): JsonRoomStateOutput {
@@ -358,7 +378,9 @@ export function generateJsonRoomStateOutput(form: JsonRoomStateForm): JsonRoomSt
   const ackTopic = buildAckTopic(trimmedRegistNo);
   const mqttClientId = buildMqttClientId(form);
   const rawMqttConnectHex = buildRawMqttConnectHex(mqttClientId);
+  const rawMqttConnectAscii = buildRawMqttConnectAscii(mqttClientId);
   const rawMqttPublishHex = buildRawMqttPublishHex(stateTopic, payloadCompact);
+  const rawMqttPublishAscii = buildRawMqttPublishAscii(stateTopic, payloadCompact);
 
   return {
     protocol_name: JSON_PROTOCOL_NAME,
@@ -369,7 +391,9 @@ export function generateJsonRoomStateOutput(form: JsonRoomStateForm): JsonRoomSt
     payload_compact: payloadCompact,
     mqtt_client_id: mqttClientId,
     raw_mqtt_connect_hex: rawMqttConnectHex,
+    raw_mqtt_connect_ascii: rawMqttConnectAscii,
     raw_mqtt_publish_hex: rawMqttPublishHex,
+    raw_mqtt_publish_ascii: rawMqttPublishAscii,
     mosquitto_pub_command: buildMosquittoPubCommand(stateTopic, payloadCompact),
     mosquitto_sub_ack_command: buildMosquittoSubAckCommand(ackTopic),
     warnings: validation.warnings.map((warning) => warning.message),

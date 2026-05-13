@@ -60,6 +60,10 @@ function toHex(bytes: Uint8Array): string {
     .join(" ");
 }
 
+function toAscii(bytes: Uint8Array): string {
+  return Array.from(bytes, (byte) => (byte >= 0x20 && byte <= 0x7e ? String.fromCharCode(byte) : ".")).join("");
+}
+
 function buildKey12(registNo: string, stallTyCode: number, stallNo: number, roomNo: number): string {
   if (registNo.length !== 6) {
     throw new Error(`regist_no must be exactly 6 characters. Received "${registNo}".`);
@@ -198,6 +202,34 @@ function buildMqttConnectHex(
     throw new Error("username is required when password is provided.");
   }
 
+  return toHex(buildMqttConnectPacket(clientId, keepAlive, username, password, cleanSession));
+}
+
+function buildMqttConnectAscii(
+  clientId: string,
+  keepAlive = 60,
+  username?: string | null,
+  password?: string | null,
+  cleanSession = true
+): string {
+  if (password && !username) {
+    throw new Error("username is required when password is provided.");
+  }
+
+  return toAscii(buildMqttConnectPacket(clientId, keepAlive, username, password, cleanSession));
+}
+
+function buildMqttConnectPacket(
+  clientId: string,
+  keepAlive = 60,
+  username?: string | null,
+  password?: string | null,
+  cleanSession = true
+): Uint8Array {
+  if (password && !username) {
+    throw new Error("username is required when password is provided.");
+  }
+
   const usernameFlag = username ? 1 : 0;
   const passwordFlag = password ? 1 : 0;
   const connectFlags = (usernameFlag << 7) | (passwordFlag << 6) | (Number(cleanSession) << 1);
@@ -219,8 +251,7 @@ function buildMqttConnectHex(
   if (password) payloadParts.push(mqttString(password));
 
   const remaining = concat(variableHeader, ...payloadParts);
-  const packet = concat([0x10], encodeRemainingLength(remaining.length), remaining);
-  return toHex(packet);
+  return concat([0x10], encodeRemainingLength(remaining.length), remaining);
 }
 
 function buildMqttPublishHex(
@@ -231,6 +262,28 @@ function buildMqttPublishHex(
   retain = false,
   dup = false
 ): string {
+  return toHex(buildMqttPublishPacket(topic, payloadText, packetId, qos, retain, dup));
+}
+
+function buildMqttPublishAscii(
+  topic: string,
+  payloadText: string,
+  packetId = 1,
+  qos = 1,
+  retain = false,
+  dup = false
+): string {
+  return toAscii(buildMqttPublishPacket(topic, payloadText, packetId, qos, retain, dup));
+}
+
+function buildMqttPublishPacket(
+  topic: string,
+  payloadText: string,
+  packetId = 1,
+  qos = 1,
+  retain = false,
+  dup = false
+): Uint8Array {
   const fixedByte = 0x30 | (Number(dup) << 3) | (qos << 1) | Number(retain);
   const topicBytes = mqttString(topic);
   const variableHeaderParts: Uint8Array[] = [topicBytes];
@@ -241,9 +294,7 @@ function buildMqttPublishHex(
 
   const payloadBytes = new TextEncoder().encode(payloadText);
   const remaining = concat(...variableHeaderParts, payloadBytes);
-  const packet = concat([fixedByte], encodeRemainingLength(remaining.length), remaining);
-
-  return toHex(packet);
+  return concat([fixedByte], encodeRemainingLength(remaining.length), remaining);
 }
 
 export async function POST(request: NextRequest) {
@@ -293,12 +344,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       key12,
       connect_hex: buildMqttConnectHex(clientId, keepAlive, username, password, cleanSession),
+      connect_ascii: buildMqttConnectAscii(clientId, keepAlive, username, password, cleanSession),
       expected_connack: "20 02 00 00",
       topic,
       state_hex: toHex(stateBin),
+      state_ascii: toAscii(stateBin),
       state_base64: buildStateBase64(stateBin),
       mqtt_payload: buildMqttPayload(refSeq, stateBin),
       publish_hex: buildMqttPublishHex(topic, buildMqttPayload(refSeq, stateBin)),
+      publish_ascii: buildMqttPublishAscii(topic, buildMqttPayload(refSeq, stateBin)),
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
